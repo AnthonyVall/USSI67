@@ -2,6 +2,9 @@
 .vscode
 .idea
 
+# Project
+save_images
+
 # Pyhton
 .venv
 **/__pycache__
