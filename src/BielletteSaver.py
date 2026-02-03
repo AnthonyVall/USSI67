@@ -1,7 +1,7 @@
+from utils import save_image
 from pathlib import Path
 import pandas as pd
 import numpy as np
-import cv2
 
 class BielletteSaver(object):
 
@@ -25,7 +25,7 @@ class BielletteSaver(object):
         if not self.__contains__(item):
             self.biellettes = pd.concat([self.biellettes, pd.DataFrame([item], columns = self.columns)], ignore_index=True)
             id: int = len(self.biellettes) - 1
-            cv2.imwrite(str(self.images_folder / f"{id}.png"), img)
+            save_image(img, self.images_folder / f"{id}.png")
             print(f'Biellette {id} added with value {item}')
 
 
@@ -34,10 +34,3 @@ class BielletteSaver(object):
             csv_file = self.csv_file
 
         pd.DataFrame(self.biellettes).to_csv(str(csv_file), index=True)
-
-
-
-if __name__ == "__main__":
-    data_path: Path = Path('../data')
-    bielletteSaver: BielletteSaver = BielletteSaver(data_path / "biellettes.csv", data_path / "images")
-    print("b'85 , 15 , 24'" in bielletteSaver)
