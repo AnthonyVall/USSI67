@@ -4,6 +4,7 @@
 
 # Project
 save_images
+data/
 
 # Pyhton
 .venv
