@@ -4,6 +4,7 @@ from pyzbar.pyzbar import decode, ZBarSymbol
 from keras.models import load_model
 from pathlib import Path
 from typing import Tuple
+from BielletteSaver import BielletteSaver
 import numpy as np
 import time
 import cv2
@@ -15,11 +16,14 @@ running = False
 def run(camera: int = 0,
         size: Tuple[int, int] = (1080, 920),
         model_path: Path = Path('D:\converted_keras/keras_model.h5'),
-        labels_path: Path = Path('../labels.txt')
+        labels_path: Path = Path('D:\converted_keras/labels.txt'),
+        data_path: Path = Path('../data'),
+
     ) -> None:
 
     model = load_model(model_path, compile=False)
     class_names = open(str(labels_path), "r").readlines()
+    bielletteSaver: BielletteSaver = BielletteSaver(data_path / "biellettes.csv", data_path / "images")
     global running
     running = True
 
@@ -35,25 +39,32 @@ def run(camera: int = 0,
         return class_names[index], prediction[0][index]
 
 
-    def decode_codes(img: np.array):
+    def decode_codes(img: np.array) -> np.array:
+        return_img: np.array = img
         for code in decode(img, symbols=[ZBarSymbol.QRCODE]):
-            print(code)
+            return_img = cv2.polylines(img, [np.array([code.polygon], np.int32)], True, (0, 255, 0), 3)
+            bielletteSaver.add_biellette(code.data, img)
+
+        return return_img
 
 
     def handle_frames(frame: Frame):
         img = transform_frame_to_array(frame, size=size)
-        render_image(img)
 
-        decode_codes(img)
-
+        """
         class_name, confidence_score = compute_element(img)
         print("Class:", class_name[2:], end="")
         print("Confidence Score:", str(np.round(confidence_score * 100))[:-2], "%")
+        """
+
+        img = decode_codes(img)
+        render_image(img)
 
         key = cv2.waitKey(1)
 
         if key == 113:  # Q
             print("Closing the application...")
+            bielletteSaver.save_biellettes()
             global running
             running = False
 
