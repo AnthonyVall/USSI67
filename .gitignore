@@ -3,9 +3,9 @@
 .idea
 
 # Project
-
 data/
 save_images/
+input_data/
 
 # Pyhton
 .venv
