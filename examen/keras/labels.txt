@@ -1,0 +1,4 @@
+0 vis
+1 écrous
+2 rondelles
+3 vide
